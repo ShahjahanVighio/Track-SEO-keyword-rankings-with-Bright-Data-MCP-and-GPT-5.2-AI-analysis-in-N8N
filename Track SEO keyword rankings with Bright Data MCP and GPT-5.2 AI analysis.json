@@ -1,0 +1,378 @@
+{
+  "name": "Track SEO keyword rankings with Bright Data MCP and GPT-5.2 AI analysis",
+  "nodes": [
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "id",
+          "value": "gpt-5.2"
+        },
+        "options": {}
+      },
+      "id": "1a7106b1-a87e-400c-80f4-2bd50eecccc7",
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "position": [
+        2144,
+        1392
+      ],
+      "typeVersion": 1.2
+    },
+    {
+      "parameters": {},
+      "id": "41700226-fff5-4cfb-8a7a-0489f22e7315",
+      "name": "MCP Client",
+      "type": "n8n-nodes-mcp.mcpClientTool",
+      "position": [
+        2320,
+        1392
+      ],
+      "typeVersion": 1,
+      "credentials": {}
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 9
+            }
+          ]
+        }
+      },
+      "id": "8feca4da-2571-4d4e-a555-f22fb5c74472",
+      "name": "🕒 Trigger: Run Daily/Weekly",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "position": [
+        1680,
+        1120
+      ],
+      "typeVersion": 1.2
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "95b1399f-4709-46e0-89a9-cbf17ce9c06c",
+              "name": "keyword",
+              "type": "string",
+              "value": "best running shoes"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "495d3699-9295-4a0d-b3e1-1fe6791f13d8",
+      "name": "📝 Input: Keyword & Domain",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        1888,
+        1120
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Based on the following keyword, provide me ranking of the 1st 5 website.\nkeyword: {{ $json.keyword }}",
+        "hasOutputParser": true,
+        "options": {}
+      },
+      "id": "1fbee18f-83ba-4226-bd80-f8d62cfd5a34",
+      "name": "🤖 SERP Scraper Agent (MCP)",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "position": [
+        2160,
+        1120
+      ],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get the SERP list from the incoming item\nconst serpList = items[0].json.output;\n\n// Emit each result as a separate item\nreturn serpList.map(result => {\n  return {\n    json: result\n  };\n});\n"
+      },
+      "id": "8abc761b-0ebf-4fea-8da4-abf576c1f6e3",
+      "name": "🧠 Format SERP Results",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        2640,
+        1120
+      ],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "1p64unH_JjzG978cAxPZC4kSZmoXgvYTA-Q7qdfnxr8Y",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1p64unH_JjzG978cAxPZC4kSZmoXgvYTA-Q7qdfnxr8Y/edit?usp=drivesdk",
+          "cachedResultName": "Website Ranking"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gid=0",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1p64unH_JjzG978cAxPZC4kSZmoXgvYTA-Q7qdfnxr8Y/edit#gid=0",
+          "cachedResultName": "Sheet1"
+        },
+        "columns": {
+          "value": {
+            "URL": "={{ $json.url }}",
+            "Rank": "={{ $json.rank }}",
+            "Title": "={{ $json.title }}",
+            "Description": "={{ $json.description }}"
+          },
+          "schema": [
+            {
+              "id": "Title",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "Title",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "URL",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "URL",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Description",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "Description",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Rank",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "Rank",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            }
+          ],
+          "mappingMode": "defineBelow",
+          "matchingColumns": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "307f190c-8a6b-48cf-b490-c8a2426c6303",
+      "name": "📊 Log to Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "position": [
+        2864,
+        1120
+      ],
+      "typeVersion": 4.6
+    },
+    {
+      "parameters": {
+        "content": "## 🟦 **Section 1: Input & Trigger Configuration**\n\n### 🕒 **Trigger: Run Daily/Weekly**\n\n🔧 **Node Name:** `Trigger: Run Daily/Weekly`\n💡 **What it does:**\nThis node automatically starts your workflow on a set schedule. You can run it:\n\n* Daily to monitor SEO fluctuations\n* Weekly to track long-term trends\n\n📌 **Why it's useful:**\nNo manual work is needed. Just set it once and it keeps your ranking logs up to date.\n\n---\n\n### 📝 **Input: Keyword & Domain**\n\n🔧 **Node Name:** `Input: Keyword & Domain`\n💡 **What it does:**\nHere you provide the **search keyword** (like `\"best running shoes\"`) and optionally the **domain name** (like `\"yourwebsite.com\"`) to monitor.\n\n📌 **Why it's useful:**\nYou can change or extend keywords anytime without changing the rest of the workflow. Great for campaign flexibility.\n\n---\n\n",
+        "height": 776,
+        "width": 360,
+        "color": 5
+      },
+      "id": "0aefd00d-74e6-4088-81f4-15a0ec37a181",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1664,
+        544
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## 🟨 **Section 2: Smart SERP Scraping with AI Agent**\n\n### 🤖 **SERP Scraper Agent (MCP)**\n\n🔧 **Node Name:** `SERP Scraper Agent (MCP)`\n💡 **What it does:**\nThis is your smart agent that uses **Bright Data's MCP (Mobile Carrier Proxy)** to simulate real user behavior and scrape **Google Search Results** accurately.\n\nIt connects to:\n\n#### 🧠 **AI Brain**\n\n🔧 **Sub-node:** `OpenAI Chat Model`\n🎯 Understands the keyword, crafts a natural query prompt, and makes sure the search context is accurate.\n\n#### 🌐 **MCP SERP Fetcher**\n\n🔧 **Sub-node:** `MCP Client`\n🛰️ Actually performs the search on Google and fetches the **top 5 results** anonymously through real mobile-like connections (bypassing CAPTCHAs & blocks).\n\n#### 🧾 **SERP Output Formatter**\n\n🔧 **Sub-node:** `Structured Output Parser`\n🧹 Cleans up the scraped data and structures it into useful fields:\n\n* `rank`\n* `title`\n* `url`\n* `description`\n\n📌 **Why it's useful:**\nTraditional scrapers break often. This smart setup ensures highly accurate, undetectable scraping that adapts to changes in search results.\n\n---\n\n",
+        "height": 1008,
+        "width": 340,
+        "color": 5
+      },
+      "id": "fc2ec034-be76-4014-84e7-1fd43cf3748a",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        2128,
+        320
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## 🟩 **Section 3: Rank Logging and Reporting**\n\n### 🧠 **Parse SERP Results**\n\n🔧 **Node Name:** `Parse SERP Results`\n💡 **What it does:**\nThis **Code node** takes the structured list of top 5 results and **splits them into individual records**, one per website.\n\n📌 **Why it's useful:**\nIt prepares the data so each row can be logged separately in your spreadsheet, which makes filtering, charting, and comparison super easy.\n\n---\n\n### 📊 **Log to Google Sheets**\n\n🔧 **Node Name:** `Log to Google Sheets`\n💡 **What it does:**\nAppends each parsed search result (rank, title, URL, description) into your tracking spreadsheet.\n\n",
+        "height": 636,
+        "width": 400,
+        "color": 5
+      },
+      "id": "fdfacbbb-44be-4dbc-aebf-3d2df3f61154",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        2608,
+        688
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "9fea59a1-4479-4a28-8f57-f5a5c84d19a6",
+      "name": "Auto-fixing Output Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserAutofixing",
+      "position": [
+        2448,
+        1392
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "id",
+          "value": "gpt-5.2"
+        },
+        "options": {}
+      },
+      "id": "98da50a6-90b0-421a-9d8a-7cc3845578ae",
+      "name": "OpenAI Chat Model1",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "position": [
+        2432,
+        1600
+      ],
+      "typeVersion": 1.2
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "[\n  {\n    \"rank\": 1,\n    \"title\": \"Runner's World\",\n    \"url\": \"https://www.runnersworld.com/gear/a19663621/best-running-shoes/\",\n    \"description\": \"A comprehensive guide on the best running shoes, recommending models like Brooks Ghost and Nike Pegasus for new runners.\"\n  },\n  {\n    \"rank\": 2,\n    \"title\": \"RunRepeat\",\n    \"url\": \"https://runrepeat.com/catalog/running-shoes\",\n    \"description\": \"Offers running shoe reviews with ratings for various models such as Nike Pegasus 41 and Hoka Mach 6.\"\n  },\n  {\n    \"rank\": 3,\n    \"title\": \"Believe in the Run\",\n    \"url\": \"https://believeintherun.com/shoe-reviews/best-running-shoes-2025/\",\n    \"description\": \"Features an in-depth guide to the best running shoes of 2025 across different categories.\"\n  },\n  {\n    \"rank\": 4,\n    \"title\": \"The Run Testers\",\n    \"url\": \"https://theruntesters.com/running-shoes/the-best-running-shoes-to-buy/\",\n    \"description\": \"Reviews the best running shoes available, highlighting their performance and value.\"\n  },\n  {\n    \"rank\": 5,\n    \"title\": \"Men's Health\",\n    \"url\": \"https://www.menshealth.com/fitness/a64476227/running-shoes-editors-picks/\",\n    \"description\": \"Provides a selection of top running shoes recommended by Men's Health editors.\"\n  }\n]\n"
+      },
+      "id": "b356df5f-f29e-4f4a-a880-6cd2902f3ebf",
+      "name": "Structured Output Parser1",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "position": [
+        2592,
+        1600
+      ],
+      "typeVersion": 1.2
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "🤖 SERP Scraper Agent (MCP)",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Auto-fixing Output Parser",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🧠 Format SERP Results": {
+      "main": [
+        [
+          {
+            "node": "📊 Log to Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Auto-fixing Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "🤖 SERP Scraper Agent (MCP)",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser1": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Auto-fixing Output Parser",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "📝 Input: Keyword & Domain": {
+      "main": [
+        [
+          {
+            "node": "🤖 SERP Scraper Agent (MCP)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🤖 SERP Scraper Agent (MCP)": {
+      "main": [
+        [
+          {
+            "node": "🧠 Format SERP Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🕒 Trigger: Run Daily/Weekly": {
+      "main": [
+        [
+          {
+            "node": "📝 Input: Keyword & Domain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "82c33512-f911-4b52-bbc4-b2c256aa1121",
+  "meta": {
+    "instanceId": "79ca1c2e1ba2143b110a64a072fbd181ef45f6d3abaeb591beacf5e31b26e46a"
+  },
+  "id": "W4QVy9Y2Uwcgy9Hu",
+  "tags": []
+}
